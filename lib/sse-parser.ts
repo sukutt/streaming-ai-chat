@@ -1,6 +1,6 @@
 import type { SseEvent } from './types';
 
-const KNOWN = new Set(['delta', 'metadata', 'progress', 'done', 'error']);
+const KNOWN = new Set<SseEvent['event']>(['delta', 'metadata', 'progress', 'done', 'error']);
 
 export function createSseParser() {
   let buffer = '';
@@ -18,7 +18,7 @@ export function createSseParser() {
           if (line.startsWith('event: ')) event = line.slice(7).trim();
           else if (line.startsWith('data: ')) data = line.slice(6);
         }
-        if (!KNOWN.has(event)) continue;
+        if (!KNOWN.has(event as SseEvent['event'])) continue;
         try {
           events.push({ event, data: JSON.parse(data) } as SseEvent);
         } catch {

@@ -23,6 +23,17 @@ describe('createSseParser', () => {
       { event: 'delta', data: { text: 'hi' } },
     ]);
   });
+  it('parses metadata and error events with nested data', () => {
+    const p = createSseParser();
+    expect(
+      p.push(
+        'event: metadata\ndata: {"cards":[],"followUps":["next?"]}\n\nevent: error\ndata: {"message":"boom"}\n\n',
+      ),
+    ).toEqual([
+      { event: 'metadata', data: { cards: [], followUps: ['next?'] } },
+      { event: 'error', data: { message: 'boom' } },
+    ]);
+  });
   it('skips unknown event types', () => {
     const p = createSseParser();
     expect(p.push('event: nope\ndata: {}\n\n')).toEqual([]);
