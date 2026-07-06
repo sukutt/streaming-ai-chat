@@ -1,6 +1,6 @@
 import type { Card, CanvasDetail, ScenarioEvent } from './types';
 
-export interface Scenario { id: 'churn' | 'concept' | 'default'; events: ScenarioEvent[]; }
+export interface Scenario { id: 'churn' | 'concept' | 'default'; events: readonly ScenarioEvent[]; }
 
 export const STARTER_PROMPTS = ["What's driving churn?", 'Run a concept test'] as const;
 

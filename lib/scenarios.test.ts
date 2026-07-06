@@ -19,10 +19,13 @@ describe('matchScenario', () => {
     expect(matchScenario(STARTER_PROMPTS[0]).id).toBe('churn');
     expect(matchScenario(STARTER_PROMPTS[1]).id).toBe('concept');
   });
-  it('every recommendation card id has canvas detail data', () => {
-    const cards = matchScenario('churn').events
-      .filter((e) => e.event === 'metadata')
-      .flatMap((e) => ('cards' in e.data ? e.data.cards : []));
-    for (const c of cards) expect(CANVAS_DETAILS[c.id]).toBeDefined();
+  it('every card id has canvas detail data', () => {
+    for (const prompt of ['churn', 'concept']) {
+      const cards = matchScenario(prompt).events
+        .filter((e) => e.event === 'metadata')
+        .flatMap((e) => ('cards' in e.data ? e.data.cards : []));
+      expect(cards.length).toBeGreaterThan(0);
+      for (const c of cards) expect(CANVAS_DETAILS[c.id]).toBeDefined();
+    }
   });
 });
