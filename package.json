@@ -2,6 +2,8 @@
   "name": "streaming-ai-chat",
   "version": "0.1.0",
   "private": true,
+  "description": "Streaming AI chat UX demo — SSE delta/metadata contract, answer cards, progress UX (mock data, no real LLM)",
+  "repository": "github:sukutt/streaming-ai-chat",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
