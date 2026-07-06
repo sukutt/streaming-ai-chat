@@ -35,6 +35,23 @@ describe('chatReducer', () => {
     expect(s.messages[1].progress).toBeUndefined();
     expect(s.messages[1].completedJob).toBe(true);
   });
+  it('done without progress leaves completedJob unset', () => {
+    let s = streamStart();
+    s = chatReducer(s, { type: 'delta', text: 'hi' });
+    s = chatReducer(s, { type: 'done' });
+    expect(s.status).toBe('idle');
+    expect(s.messages[1].completedJob).toBeUndefined();
+    expect(s.messages[1].text).toBe('hi');
+  });
+  it('second send appends a new turn', () => {
+    let s = streamStart();
+    s = chatReducer(s, { type: 'done' });
+    s = chatReducer(s, { type: 'send', prompt: 'again' });
+    expect(s.messages).toHaveLength(4);
+    expect(s.messages[2]).toMatchObject({ role: 'user', text: 'again' });
+    expect(s.messages[3]).toMatchObject({ role: 'assistant', text: '' });
+    expect(s.lastPrompt).toBe('again');
+  });
   it('stop keeps partial text and marks stopped', () => {
     let s = streamStart();
     s = chatReducer(s, { type: 'delta', text: 'partial' });
@@ -48,6 +65,7 @@ describe('chatReducer', () => {
     s = chatReducer(s, { type: 'error', message: 'network' });
     expect(s.status).toBe('error');
     expect(s.lastPrompt).toBe('hi');
+    expect(s.messages[1].error).toBe('network');
   });
   it('canvas open/close', () => {
     let s = chatReducer(initialChatState, { type: 'open_canvas', cardId: 'churn-billing' });
