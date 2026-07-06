@@ -2,6 +2,7 @@
 import { useCallback, useReducer, useRef } from 'react';
 import { chatReducer, initialChatState } from './chat-reducer';
 import { createSseParser } from './sse-parser';
+import type { SseEvent } from './types';
 
 export function useChatStream() {
   const [state, dispatch] = useReducer(chatReducer, initialChatState);
@@ -14,6 +15,13 @@ export function useChatStream() {
     const ac = new AbortController();
     abortRef.current = ac;
     dispatch({ type: 'send', prompt: trimmed });
+    const handle = (ev: SseEvent) => {
+      if (ev.event === 'delta') dispatch({ type: 'delta', text: ev.data.text });
+      else if (ev.event === 'metadata') dispatch({ type: 'metadata', cards: ev.data.cards, followUps: ev.data.followUps });
+      else if (ev.event === 'progress') dispatch({ type: 'progress', stage: ev.data.stage, ratio: ev.data.ratio });
+      else if (ev.event === 'done') dispatch({ type: 'done' });
+      else if (ev.event === 'error') dispatch({ type: 'error', message: ev.data.message });
+    };
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -28,15 +36,12 @@ export function useChatStream() {
       for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
-        for (const ev of parser.push(decoder.decode(value, { stream: true }))) {
-          if (ev.event === 'delta') dispatch({ type: 'delta', text: ev.data.text });
-          else if (ev.event === 'metadata') dispatch({ type: 'metadata', cards: ev.data.cards, followUps: ev.data.followUps });
-          else if (ev.event === 'progress') dispatch({ type: 'progress', stage: ev.data.stage, ratio: ev.data.ratio });
-          else if (ev.event === 'done') dispatch({ type: 'done' });
-          else if (ev.event === 'error') dispatch({ type: 'error', message: ev.data.message });
-        }
+        for (const ev of parser.push(decoder.decode(value, { stream: true }))) handle(ev);
       }
+      // Flush the decoder in case a multi-byte char straddled the final chunk.
+      for (const ev of parser.push(decoder.decode())) handle(ev);
     } catch (err) {
+      if (abortRef.current !== ac) return; // stale request — a newer send owns the stream
       if ((err as Error).name === 'AbortError') dispatch({ type: 'stop' });
       else dispatch({ type: 'error', message: (err as Error).message });
     }
