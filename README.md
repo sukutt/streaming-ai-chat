@@ -1,6 +1,6 @@
 # Streaming AI Chat Demo
 
-**Live demo:** https://streaming-ai-chat.vercel.app *(link will be updated after deploy)*
+**Live demo:** https://streaming-ai-chat-five.vercel.app
 
 A scripted, self-contained demo of the streaming-chat UX patterns I ship in
 production AI products: token-by-token SSE rendering, a delta/metadata event
