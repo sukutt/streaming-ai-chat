@@ -16,7 +16,7 @@ const churnDeltas = `Looking at the last 90 days of (synthetic) usage data, chur
 
 const CHURN_EVENTS: ScenarioEvent[] = [
   ...churnDeltas.map((t) => d(t)),
-  { event: 'metadata', data: { cards: CHURN_CARDS, followUps: ['Show retention by cohort', 'Run a concept test'] }, delayMs: 200 },
+  { event: 'metadata', data: { cards: CHURN_CARDS, followUps: ['Run a concept test'] }, delayMs: 200 },
   { event: 'done', data: {}, delayMs: 80 },
 ];
 

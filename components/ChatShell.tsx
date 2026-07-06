@@ -47,8 +47,13 @@ export function ChatShell() {
                         {streaming && i === state.messages.length - 1 && <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-blue-600 align-middle" />}
                       </p>
                     )}
-                    {m.progress && <ProgressBar stage={m.progress.stage} ratio={m.progress.ratio} completed={false} />}
-                    {m.completedJob && <ProgressBar stage="Done" ratio={1} completed />}
+                    {(m.progress || m.completedJob) && (
+                      <ProgressBar
+                        stage={m.progress?.stage ?? 'Done'}
+                        ratio={m.progress?.ratio ?? 1}
+                        completed={!!m.completedJob}
+                      />
+                    )}
                     {m.cards?.map((c) =>
                       c.type === 'recommendation'
                         ? <RecommendationCard key={c.id} card={c} onOpen={openCanvas} />
