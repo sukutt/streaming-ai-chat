@@ -20,7 +20,7 @@ export function ChatShell() {
   const openCanvas = (cardId: string) => dispatch({ type: 'open_canvas', cardId });
 
   return (
-    <div className="flex h-dvh">
+    <div className="relative flex h-dvh">
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between border-b border-slate-200 px-6 py-3">
           <span className="font-bold text-slate-900">Streaming AI Chat <span className="text-blue-600">Demo</span></span>
